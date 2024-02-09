@@ -131,7 +131,7 @@ main {
     justify-content: center;
     gap: 19px;
     margin: 2rem auto;
-    width: 1180px;
+    width: 100%;
     max-width: 100%;
 }
 
