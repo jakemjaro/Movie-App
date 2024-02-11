@@ -8,22 +8,21 @@
     <link rel="stylesheet" href="style.css">
     <title>Movie App</title>
 </head>
-<body>
+<body onload="showGallery()">
     <header>
-        <h1>Movie<span>Info</span></h1>
+        <a href="/"><h1>Movie<span>Info</span></h1></a>
         <form id="search-form">
             <input type="text" id="searchbar" placeholder="Search. . ." autocomplete="off">
             <button class="search-button" type="submit"><i class='bx bx-search'></i></button>
             <div class="dropdown"></div>
         </form>
         <div class="nav-menu">
-            <a href="">Gallery</a>
-            <a href="">Latest</a>
-            <a href="">Popular</a>
+            <div href="#" id="Gallery" class="current">Gallery</div>
+            <div href="#" id="Popular">Popular</div>
         </div>
         
     </header>
-
+    <h2>Gallery</h2>
     <main>
 
     </main>

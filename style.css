@@ -50,16 +50,6 @@ header {
     gap: 1rem;
 }
 
-header a {
-    padding: 10px 1rem;
-    border-radius: 10px;
-    transition: background-color 0.3s ease-in-out;
-}
-
-header a:hover {
-    background-color: rgba(5, 190, 116, 0.5);
-}
-
 h1 {
     font-size: 3em;
 }
@@ -69,10 +59,27 @@ h1 span {
 }
 
 .nav-menu {
-    width: 250px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.nav-menu div {
+    padding: 8px 0.9rem;
+    border-radius: 10px;
+    transition: background-color 0.3s ease-in, color 0.3s ease-in;
+    border: 1px solid var(--main-color);
+}
+
+.nav-menu div:hover {
+    cursor: pointer;
+    background-color: var(--main-color);
+    color: #fff;
+} 
+
+.nav-menu div.current {
+    background-color: var(--main-color);
+    color: #fff;
 }
 
 #search-form {
@@ -125,6 +132,13 @@ h1 span {
     cursor: pointer;
 }
 
+h2 {
+    margin: 0 auto;
+    width: max-content;
+    font-size: 1.8em;
+    border-bottom: 4px solid var(--main-color);
+}
+
 main {
     display: flex;
     flex-wrap: wrap;
@@ -138,8 +152,8 @@ main {
 .movie-card {
     background: #303036;
     color: #fff;
-    min-width: 380px;
     width: 380px;
+    max-width: 100%;
     height: 220px;
     display: flex;
     border-radius: 6px;
@@ -179,11 +193,6 @@ main {
     overflow: hidden;
     text-wrap: nowrap;
     text-overflow: ellipsis;
-}
-
-.movie-card .movie-card-details h3:hover {
-    text-decoration: underline;
-    cursor: pointer;
 }
 
 .movie-card .movie-card-details p {

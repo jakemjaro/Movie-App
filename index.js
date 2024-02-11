@@ -5,6 +5,9 @@ const searchbar  = document.querySelector("#searchbar");
 const searchform = document.querySelector("#search-form");
 const mainElement = document.querySelector("main");
 let page = 1;
+const navLinks = document.querySelectorAll(".nav-menu div");
+const popular = document.querySelector("#Popular");
+const gallery = document.querySelector("#Gallery");
 
 async function getResults(url) {
     try {
@@ -44,23 +47,69 @@ function createMovieCard(movie) {
     }
 }
 
-function clearHTML() {
+function clearMain() {
     mainElement.innerHTML = "";
 }
 
+function showItems(items) {
+    const pageContent = items.map(createMovieCard).join("");
+    mainElement.innerHTML += pageContent;
+}
+
+navLinks.forEach(link => {
+    link.addEventListener('click',() => {
+        document.querySelector(".current")?.classList.remove("current");
+        link.classList.add("current");
+    });
+});
+
+async function getAndShowResults(url) {
+    const response = await getResults(url);
+    const popularList = response.results;
+
+    if (response && popularList) {
+        clearMain();
+        showItems(popularList);
+    }
+}
 
 searchform.addEventListener('submit', async (event) => {
     event.preventDefault();
-    const query = searchbar.value.trim();
-    const searchURL = `${searchApi}${query}&page=${page}`;
+    if (searchbar.value) {
+        const query = searchbar.value.trim();
+        const searchURL = `${searchApi}${query}&page=${page}`;
 
-    const responseObj = await getResults(searchURL);
-    const movieList = responseObj.results;
+        const responseObj = await getResults(searchURL);
+        const movieList = responseObj.results;
 
-    if (responseObj && movieList) {
-        const pageContent = movieList.map(createMovieCard).join("");
-        clearHTML();
-        mainElement.innerHTML += pageContent;
+        if (responseObj && movieList) {
+            clearMain();
+            showItems(movieList);
+        }
+
+        document.querySelector("h2").innerHTML = "Results";
+
+        navLinks.forEach(link => {
+            if (link.classList.contains("current")) {
+                link.classList.remove("current");
+            }
+        });
     }
 });
 
+popular.addEventListener('click', async () => {
+    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
+    await getAndShowResults(url);
+
+    document.querySelector("h2").innerHTML = "Popular";
+});
+
+async function showGallery() {
+    const date = new Date();
+    const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&include_adult=false&include_video=false&language=en-US&page=1&primary_release_year=${date.getFullYear()-1}`;
+    await getAndShowResults(url);
+
+    document.querySelector("h2").innerHTML = "Gallery";
+}
+
+gallery.addEventListener('click', showGallery);
