@@ -1,13 +1,21 @@
+let galleryPage = 1;
+let popularPage = 1;
+let searchPage = 1;
+let onGallery = true;
+let onPopular = false;
+let onSearch = false;
+const date = new Date();
 const apiKey = "e0494b660f3bddebb49e11dbe99b328a";
-const searchApi = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=`;
+let searchApi = `https://api.themoviedb.org/3/search/movie?&api_key=${apiKey}&query=`;
 const imageApi = `https://image.tmdb.org/t/p/w500/`;
+let galleryURL = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&include_adult=false&include_video=false&language=en-US&primary_release_year=${date.getFullYear()-1}&page=`;
+let popularURL = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}&page=`;
 const searchbar  = document.querySelector("#searchbar");
 const searchform = document.querySelector("#search-form");
 const mainElement = document.querySelector("main");
-let page = 1;
-const navLinks = document.querySelectorAll(".nav-menu div");
-const popular = document.querySelector("#Popular");
-const gallery = document.querySelector("#Gallery");
+const navLinks = document.querySelectorAll(".nav-menu button");
+const popularButton = document.querySelector("#Popular");
+const galleryButton = document.querySelector("#Gallery");
 
 async function getResults(url) {
     try {
@@ -17,7 +25,7 @@ async function getResults(url) {
         }
         return await response.json();
     } catch (err) {
-        console.log(err.message);
+        console.log(err);
         return null;
     }
 }
@@ -51,7 +59,7 @@ function clearMain() {
     mainElement.innerHTML = "";
 }
 
-function showItems(items) {
+function displayItems(items) {
     const pageContent = items.map(createMovieCard).join("");
     mainElement.innerHTML += pageContent;
 }
@@ -65,51 +73,69 @@ navLinks.forEach(link => {
 
 async function getAndShowResults(url) {
     const response = await getResults(url);
-    const popularList = response.results;
+    const movieList = response.results;
 
-    if (response && popularList) {
-        clearMain();
-        showItems(popularList);
+    if (response && movieList) {
+        displayItems(movieList);
+    }
+}
+
+async function handleSearch() {
+    if (searchbar.value) {
+        const query = searchbar.value.trim();
+        const searchURL = `${searchApi}${query}&page=${searchPage}`;
+        
+        await getAndShowResults(searchURL);
     }
 }
 
 searchform.addEventListener('submit', async (event) => {
     event.preventDefault();
-    if (searchbar.value) {
-        const query = searchbar.value.trim();
-        const searchURL = `${searchApi}${query}&page=${page}`;
+    onSearch = true;
+    onGallery = false;
+    onPopular = false;
+    clearMain();
+    await handleSearch();
 
-        const responseObj = await getResults(searchURL);
-        const movieList = responseObj.results;
+    document.querySelector("h2").innerHTML = "Results";
 
-        if (responseObj && movieList) {
-            clearMain();
-            showItems(movieList);
-        }
-
-        document.querySelector("h2").innerHTML = "Results";
-
-        navLinks.forEach(link => {
-            if (link.classList.contains("current")) {
-                link.classList.remove("current");
-            }
-        });
-    }
+    navLinks.forEach(link => {
+        link.classList?.remove("current");
+    });
 });
 
-popular.addEventListener('click', async () => {
-    const url = `https://api.themoviedb.org/3/movie/popular?api_key=${apiKey}`;
-    await getAndShowResults(url);
-
+popularButton.addEventListener('click', async () => {
+    clearMain();
+    await getAndShowResults(popularURL);
     document.querySelector("h2").innerHTML = "Popular";
+    onGallery = false;
+    onPopular = true;
 });
 
 async function showGallery() {
-    const date = new Date();
-    const url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&include_adult=false&include_video=false&language=en-US&page=1&primary_release_year=${date.getFullYear()-1}`;
-    await getAndShowResults(url);
-
+    clearMain();
+    await getAndShowResults(galleryURL);
     document.querySelector("h2").innerHTML = "Gallery";
+    onGallery = true;
+    onPopular = false;
 }
 
-gallery.addEventListener('click', showGallery);
+galleryButton.addEventListener('click', showGallery);
+
+async function loadMore() {
+    const {scrollTop, scrollHeight, clientHeight} = document.documentElement;
+    if (scrollTop + clientHeight >= scrollHeight) {
+        if (onGallery) {
+            galleryPage++;
+            await getAndShowResults(galleryURL+galleryPage);
+        } else if (onPopular) {
+            popularPage++;
+            await getAndShowResults(popularURL+popularPage);
+        } else if (onSearch) {
+            searchPage++;
+            await handleSearch();
+        }
+    }
+}
+
+window.addEventListener('scroll', loadMore);
