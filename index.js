@@ -94,6 +94,7 @@ searchform.addEventListener('submit', async (event) => {
     onSearch = true;
     onGallery = false;
     onPopular = false;
+    searchPage = 1;
     clearMain();
     await handleSearch();
 
@@ -105,19 +106,23 @@ searchform.addEventListener('submit', async (event) => {
 });
 
 popularButton.addEventListener('click', async () => {
+    onSearch = false;
+    onGallery = false;
+    onPopular = true;
+    popularPage = 1;
     clearMain();
     await getAndShowResults(popularURL);
     document.querySelector("h2").innerHTML = "Popular";
-    onGallery = false;
-    onPopular = true;
 });
 
 async function showGallery() {
+    onGallery = true;
+    onPopular = false;
+    onSearch = false;
+    galleryPage = 1;
     clearMain();
     await getAndShowResults(galleryURL);
     document.querySelector("h2").innerHTML = "Gallery";
-    onGallery = true;
-    onPopular = false;
 }
 
 galleryButton.addEventListener('click', showGallery);
